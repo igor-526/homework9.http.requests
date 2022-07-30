@@ -1,6 +1,5 @@
 import os
 import requests
-
 def menu(choise):
     while choise != 'q':
         print('1. Показать самого умного супергероя')
@@ -21,7 +20,6 @@ def menu(choise):
                 print()
     else:
         print('До свидания!')
-
 def most_intelligence_superhero():
     def getintelligence(hero):
         return (hero['intelligence'])
@@ -45,9 +43,23 @@ def write_to_yandexdisk():
         if input('использовать существующий токен (y) или записать новый (n)? ') == "n":
             new_yandextoken()
         else:
-            print("выполняем")
+            class YaDisk:
+                def __init__(self, token: str):
+                    self.token = token
+                def upload(self, path_to_file, path_to_write):
+                    url = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload'
+                    headers = {'Content-Type': 'application/json', 'Authorization': self.token}
+                    response = requests.get(url, headers=headers, params={'path': path_to_write, 'overwrite': "true"})
+                    upload_url = response.json()['href']
+                    response = requests.put(upload_url, data=open(path_to_file, 'rb'))
+                    print(response)
 
-
+            with open('token.txt') as yatoken:
+                token = f'OAuth {yatoken.read()}'
+            path_to_file = "token.txt" #какой файл записываем
+            path_to_write = 'token.txt' #куда записываем
+            disk = YaDisk(token)
+            print(disk.upload(path_to_file, path_to_write))
 
 if __name__ == '__main__':
     menu(0)
